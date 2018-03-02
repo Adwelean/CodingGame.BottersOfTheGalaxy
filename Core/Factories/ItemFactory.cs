@@ -1,10 +1,9 @@
-﻿using Core.Items;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace Core.Factories
 {
+    using Core.Items;
+
     public static class ItemFactory
     {
         public static ItemBase ParseItem(string[] inputs)

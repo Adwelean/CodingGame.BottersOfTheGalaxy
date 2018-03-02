@@ -1,16 +1,15 @@
-﻿using Core.Actors;
-using Core.Factories;
-using Core.Fights;
-using Core.Interactives;
-using Core.Items;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Core.Game
+﻿namespace Core
 {
+    using Core.Actors;
+    using Core.Factories;
+    using Core.Fights;
+    using Core.Interactives;
+    using Core.Items;
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class GameEngine
     {
         FightManager fightManager = new FightManager();

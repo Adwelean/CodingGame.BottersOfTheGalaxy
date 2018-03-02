@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Items
+﻿namespace Core.Items
 {
     public class Consumable : ItemBase
     {

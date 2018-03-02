@@ -1,11 +1,10 @@
-﻿using Core.Actors;
-using Core.Interactives;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Factories
+﻿namespace Core.Factories
 {
+    using System;
+
+    using Core.Actors;
+    using Core.Interactives;
+
     public static class InteractiveObjectFactory
     {
         public enum InteractiveObjectType

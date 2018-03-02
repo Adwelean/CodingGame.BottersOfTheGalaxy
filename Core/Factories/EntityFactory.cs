@@ -1,14 +1,15 @@
-﻿using Core.Actors;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Factories
+﻿namespace Core.Factories
 {
+    using System;
+
+    using Core.Actors;
+    using Core.Utils;
+
     public static class EntityFactory
     {
         public static Entity ParseEntity(string[] inputs)
         {
+            EntityType entityType;
             Entity entity = null;
 
             int unitId = int.Parse(inputs[0]);
@@ -38,8 +39,29 @@ namespace Core.Factories
 
             string unitType = inputs[2]; // UNIT, HERO, TOWER, can also be GROOT from wood1
 
-            // TODO: derive base type to children
-            //entity = Reflection.ToDerived<Entity, [ParsedUnitTypeClass]>(entity);
+
+            if(Enum.TryParse(unitType, out entityType))
+            {
+                switch(entityType)
+                {
+                    case EntityType.UNIT:
+                        entity = UnBoxingHelper.ToDerived<Entity, Creep>(entity);
+                        break;
+
+                    case EntityType.HERO:
+                        entity = UnBoxingHelper.ToDerived<Entity, Hero>(entity);
+                        break;
+
+                    case EntityType.TOWER:
+                        entity = UnBoxingHelper.ToDerived<Entity, Tower>(entity);
+                        break;
+
+                    case EntityType.GROOT:
+                        entity = UnBoxingHelper.ToDerived<Entity, Groot>(entity);
+                        break;
+                }
+            }
+
 
             return entity;
         }

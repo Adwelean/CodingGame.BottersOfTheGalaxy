@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Utils
+﻿namespace Core.Utils
 {
+    using System;
+
     public class Point
     {
         double x;

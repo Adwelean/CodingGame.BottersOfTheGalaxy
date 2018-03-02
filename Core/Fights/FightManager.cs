@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Fights
+﻿namespace Core.Fights
 {
+    using System.Text;
+
     public class FightManager
     {
         StringBuilder output;

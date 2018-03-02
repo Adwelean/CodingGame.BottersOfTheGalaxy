@@ -1,10 +1,7 @@
-﻿using Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Game
+﻿namespace Core
 {
+    using Core.Utils;
+
     class GameSettings
     {
         //LEAGUE

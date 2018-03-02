@@ -1,11 +1,10 @@
-﻿using Core.Actors;
-using Core.Game;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Fights
+﻿namespace Core.Fights
 {
+    using System.Collections.Generic;
+
+    using Core;
+    using Core.Actors;
+   
     public class Team
     {
         int id;

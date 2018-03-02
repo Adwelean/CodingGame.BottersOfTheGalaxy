@@ -1,10 +1,7 @@
-﻿using Core.Actors;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Interactives
+﻿namespace Core.Interactives
 {
+    using Core.Actors;
+
     public class Spawn : EntityBase
     {
         public Spawn(double x, double y) 
