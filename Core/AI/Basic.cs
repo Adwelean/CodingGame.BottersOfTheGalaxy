@@ -63,7 +63,7 @@
                 return State.Protect;
             }
             else if (PlayerTeam.Entities.Count(x => x is Creep) > EnnemyTeam.Entities.Count(x => x is Creep) &&
-                     playerHero.Distance(ennemyTower) < GameSettings.MapWidth / 4)
+                     playerHero.Distance(ennemyTower) < GameSettings.MapWidth / 4) // TODO: change by playerHero.IsInRange(ennemyTower, ennemyTower.AttackRange) ?
             {
                 return State.TowerAssault;
             }
@@ -126,7 +126,7 @@
             var previousCreep = PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive && x.Id != creepShield.Id).OrderByDescending(x => x.X).FirstOrDefault();
 
             if(previousCreep != null)
-                return new Commands.Move(creepShield.X, creepShield.Y);
+                return new Commands.Move(previousCreep.X, previousCreep.Y);
             else
                 return new Commands.Move(creepShield.X, creepShield.Y);
         }
