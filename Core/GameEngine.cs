@@ -94,37 +94,45 @@
             // game loop
             while (true)
             {
-                PlayerTeam.UpdateEntities();
-                EnnemyTeam.UpdateEntities();
-
-                PlayerTeam.Gold = int.Parse(Console.ReadLine());
-                EnnemyTeam.Gold = int.Parse(Console.ReadLine());
-                
-                int roundType = int.Parse(Console.ReadLine()); // a positive value will show the number of heroes that await a command
-                int entityCount = int.Parse(Console.ReadLine());
-
-                for (int i = 0; i < entityCount; i++)
+                try
                 {
-                    inputs = Console.ReadLine().Split(' ');
-                    int teamId = int.Parse(inputs[1]);
+                    PlayerTeam.UpdateEntities();
+                    EnnemyTeam.UpdateEntities();
 
-                    var entity = EntityFactory.ParseEntity(inputs);
+                    PlayerTeam.Gold = int.Parse(Console.ReadLine());
+                    EnnemyTeam.Gold = int.Parse(Console.ReadLine());
 
-                    // TODO: add method ? observer ?
-                    var team = (PlayerTeam.Id == teamId) ? PlayerTeam : EnnemyTeam;
-                    team.Entities.Add(entity);
+                    int roundType = int.Parse(Console.ReadLine()); // a positive value will show the number of heroes that await a command
+                    int entityCount = int.Parse(Console.ReadLine());
+
+                    for (int i = 0; i < entityCount; i++)
+                    {
+                        inputs = Console.ReadLine().Split(' ');
+                        int teamId = int.Parse(inputs[1]);
+
+                        var entity = EntityFactory.ParseEntity(inputs);
+
+                        // TODO: add method ? observer ?
+                        var team = (PlayerTeam.Id == teamId) ? PlayerTeam : EnnemyTeam;
+                        team.Entities.Add(entity);
+                    }
+
+                    // Write an action using Console.WriteLine()
+                    // To debug: Console.Error.WriteLine("Debug messages...");
+
+
+                    this.fightManager.NextTurn();
+
+                    // If roundType has a negative value then you need to output a Hero name, such as "DEADPOOL" or "VALKYRIE".
+                    // Else you need to output roundType number of any valid action, such as "WAIT" or "ATTACK unitId"
+                    //Console.WriteLine("WAIT");
+                    Console.WriteLine(this.fightManager.RenderOutput());
                 }
-
-                // Write an action using Console.WriteLine()
-                // To debug: Console.Error.WriteLine("Debug messages...");
-
-
-                this.fightManager.NextTurn();
-
-                // If roundType has a negative value then you need to output a Hero name, such as "DEADPOOL" or "VALKYRIE".
-                // Else you need to output roundType number of any valid action, such as "WAIT" or "ATTACK unitId"
-                //Console.WriteLine("WAIT");
-                Console.WriteLine(this.fightManager.RenderOutput());
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.InnerException);
+                    Console.WriteLine("WAIT");
+                }
             }
         }
     }

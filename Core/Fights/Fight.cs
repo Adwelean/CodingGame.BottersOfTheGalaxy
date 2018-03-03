@@ -16,7 +16,7 @@
 
     public class Fight
     {
-        StringBuilder output;
+        List<string> output = new List<string>();
 
         public Player CurrentPlayer { get; set; }
         public FightPhase FightPhase { get; set; }
@@ -25,9 +25,8 @@
         public IArtificialIntelligence CurrentAI { get; set; }
        
 
-        public Fight(ref StringBuilder output)
+        public Fight()
         {
-            this.output = output;
         }
 
         public void Initialize(Player currentPlayer)
@@ -49,7 +48,7 @@
         {
             if (FightPhase == FightPhase.PLACEMENT)
             {
-                this.output.AppendLine(CurrentPlayer.ChooseHero(EnnemyTeam).ToString());
+                this.output.Add(CurrentPlayer.ChooseHero(EnnemyTeam).ToString());
                 FightPhase = FightPhase.FIGHTING;
             }
         }
@@ -58,10 +57,18 @@
         {
             PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
                 if (hero.IA != null)
-                    this.output.AppendLine(hero.IA.ComputeAction(PlayerTeam, EnnemyTeam));
+                    this.output.Add(hero.IA.ComputeAction(PlayerTeam, EnnemyTeam));
                 else
-                    this.output.AppendLine(CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam));
+                    this.output.Add(CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam));
             });
+        }
+
+        public string BuildOutput()
+        {
+            var outputResult = string.Concat(output);
+            output.Clear();
+
+            return outputResult;
         }
     }
 }
