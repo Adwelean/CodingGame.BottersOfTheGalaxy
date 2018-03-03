@@ -43,7 +43,7 @@
                 Teams.Add(team);
         }
 
-        public void Start()
+        public void Pick()
         {
             if (FightPhase == FightPhase.PLACEMENT)
             {

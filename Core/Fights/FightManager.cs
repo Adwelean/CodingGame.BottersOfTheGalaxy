@@ -31,7 +31,7 @@
         {
             var outputResult = output.ToString();
 
-            return outputResult != "" ? outputResult : "WAIT";
+            return !string.IsNullOrEmpty(outputResult) ? outputResult : "WAIT";
         }
     }
 }
