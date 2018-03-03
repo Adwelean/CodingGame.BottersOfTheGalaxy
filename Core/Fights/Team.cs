@@ -22,12 +22,12 @@
 
         public void UpdateEntities()
         {
-            Entities.Clear();
-            /*if (Entities.Count > 0)
+            //Entities.Clear();
+            if (Entities.Count > 0)
             {
-                LastEntities.AddRange(Entities);
+                LastEntities = new List<EntityBase>(Entities);
                 Entities.Clear();
-            }*/
+            }
         }
 
         public int Id { get => this.id; set => this.id = value; }

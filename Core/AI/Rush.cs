@@ -1,6 +1,4 @@
-﻿
-
-namespace Core.IA
+﻿namespace Core.AI
 {
     using System.Linq;
     using Core.Actors;

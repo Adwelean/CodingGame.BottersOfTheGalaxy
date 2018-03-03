@@ -1,7 +1,7 @@
 ﻿namespace Core.Fights
 {
     using Core.Actors;
-    using Core.IA;
+    using Core.AI;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -56,8 +56,8 @@
         public void NextTurn()
         {
             PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
-                if (hero.IA != null)
-                    this.output.Add(hero.IA.ComputeAction(PlayerTeam, EnnemyTeam));
+                if (hero.AI != null)
+                    this.output.Add(hero.AI.ComputeAction(PlayerTeam, EnnemyTeam));
                 else
                     this.output.Add(CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam));
             });

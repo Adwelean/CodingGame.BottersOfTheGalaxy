@@ -54,5 +54,7 @@
         public int MovementSpeed { get => movementSpeed; set => movementSpeed = value; }
         public int StunDuration { get => stunDuration; set => stunDuration = value; }
         public int GoldValue { get => goldValue; set => goldValue = value; }
+
+        public bool IsAlive => Health > 0;
     }
 }

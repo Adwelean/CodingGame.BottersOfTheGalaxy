@@ -1,4 +1,4 @@
-﻿namespace Core.IA
+﻿namespace Core.AI
 {
     using Core.Fights;
 

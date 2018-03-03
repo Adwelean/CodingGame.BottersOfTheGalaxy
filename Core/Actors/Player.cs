@@ -1,5 +1,5 @@
 ﻿using Core.Fights;
-using Core.IA;
+using Core.AI;
 
 namespace Core.Actors
 {
@@ -12,12 +12,13 @@ namespace Core.Actors
         public Player(int teamId)
         {
             this.teamId = teamId;
-            this.ai = new Rush();
+            //this.ai = new AI.Rush();
+            this.ai = new AI.Basic();
         }
 
         public HeroType ChooseHero(Team team)
         {
-            return HeroType.HULK;
+            return HeroType.VALKYRIE;
         }
 
         public int TeamId { get => teamId; set => teamId = value; }

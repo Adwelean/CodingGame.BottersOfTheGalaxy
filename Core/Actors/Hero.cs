@@ -1,6 +1,6 @@
 ﻿namespace Core.Actors
 {
-    using Core.IA;
+    using Core.AI;
 
     public enum HeroType
     {
@@ -79,6 +79,6 @@
         public int IsVisible { get => isVisible; set => isVisible = value; }
         public int ItemsOwned { get => itemsOwned; set => itemsOwned = value; }
 
-        public IArtificialIntelligence IA { get; set; }
+        public IArtificialIntelligence AI { get; set; }
     }
 }
