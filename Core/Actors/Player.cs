@@ -1,8 +1,9 @@
-﻿using Core.Fights;
-using Core.AI;
-
-namespace Core.Actors
+﻿namespace Core.Actors
 {
+    using System.Linq;
+    using Core.Fights;
+    using Core.AI;
+
     public class Player
     {
         int teamId;

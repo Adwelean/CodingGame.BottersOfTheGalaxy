@@ -7,6 +7,8 @@
 
     public class Basic : IArtificialIntelligence
     {
+        double ApplyDirection(int teamId, double to) => (teamId > 0) ? GameSettings.HeroSpawnTeamB.X - to : to;
+
         public string ComputeAction(Team currentTeam, Team ennemyTeam)
         {
             var myHeroLastTurn = currentTeam.LastEntities.FirstOrDefault(x => x is Hero) as Hero;
@@ -31,7 +33,7 @@
             if (myHero.Health < myHero.MaxHealth / 3)
             {
                 if (myLastCreep != null)
-                    return $"MOVE {myLastCreep.X - ((myLastCreep.X > myHero.MovementSpeed) ? myHero.MovementSpeed : 0)} {myLastCreep.Y}";
+                    return $"MOVE {ApplyDirection(currentTeam.Id, myLastCreep.X - ((myLastCreep.X > myHero.MovementSpeed) ? myHero.MovementSpeed : 0))} {myLastCreep.Y}";
                 else
                     return $"MOVE {myTower.X} {myTower.Y}";
             }
@@ -40,7 +42,7 @@
             {
                 // Pick and roll
                 if (myHeroLastTurn != null && myHero.Health < myHeroLastTurn.Health)
-                    return $"MOVE {target.X - (target.MovementSpeed + target.AttackRange)} {target.Y}";
+                    return $"MOVE {ApplyDirection(currentTeam.Id, target.X - (target.MovementSpeed + target.AttackRange))} {target.Y}";
                         
                 if (target != null)
                 {
@@ -59,7 +61,7 @@
             else
             {
                 if (myLastCreep != null)
-                    return $"MOVE {myLastCreep.X - ((myLastCreep.X > myHero.MovementSpeed) ? myHero.MovementSpeed : 0)} {myLastCreep.Y}";
+                    return $"MOVE {ApplyDirection(currentTeam.Id, myLastCreep.X - ((myLastCreep.X > myHero.MovementSpeed) ? myHero.MovementSpeed : 0))} {myLastCreep.Y}";
                 else
                     return $"MOVE {myTower.X} {myTower.Y}";
             }
