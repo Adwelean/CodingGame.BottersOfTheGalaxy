@@ -15,10 +15,6 @@
             int unitId = int.Parse(inputs[0]);
             int x = int.Parse(inputs[3]);
             int y = int.Parse(inputs[4]);
-
-            entity = new Entity(x, y, unitId);
-            
-            // TODO: add this to entity
             int attackRange = int.Parse(inputs[5]);
             int health = int.Parse(inputs[6]);
             int maxHealth = int.Parse(inputs[7]);
@@ -33,23 +29,42 @@
             int mana = int.Parse(inputs[16]);
             int maxMana = int.Parse(inputs[17]);
             int manaRegeneration = int.Parse(inputs[18]);
-            string heroType = inputs[19]; // DEADPOOL, VALKYRIE, DOCTOR_STRANGE, HULK, IRONMAN
             int isVisible = int.Parse(inputs[20]); // 0 if it isn't
             int itemsOwned = int.Parse(inputs[21]); // useful from wood1
 
-            string unitType = inputs[2]; // UNIT, HERO, TOWER, can also be GROOT from wood1
+            entity = new Entity(
+                x,
+                y,
+                unitId,
+                attackRange,
+                health,
+                maxHealth,
+                shield,
+                attackDamage,
+                movementSpeed,
+                stunDuration,
+                goldValue);
 
+            
+            string unitType = inputs[2]; // UNIT, HERO, TOWER, can also be GROOT from wood1
 
             if(Enum.TryParse(unitType, out entityType))
             {
-                switch(entityType)
+                switch (entityType)
                 {
                     case EntityType.UNIT:
                         entity = UnBoxingHelper.ToDerived<Entity, Creep>(entity);
                         break;
 
                     case EntityType.HERO:
-                        entity = UnBoxingHelper.ToDerived<Entity, Hero>(entity);
+                        HeroType heroType;
+                        string tmpHeroType = inputs[19]; // DEADPOOL, VALKYRIE, DOCTOR_STRANGE, HULK, IRONMAN
+
+                        if(Enum.TryParse(tmpHeroType, out heroType))
+                        {
+                            entity = UnBoxingHelper.ToDerived<Entity, Hero>(entity);
+                            (entity as Hero).HeroType = heroType;
+                        }
                         break;
 
                     case EntityType.TOWER:

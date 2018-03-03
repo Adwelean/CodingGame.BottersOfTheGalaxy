@@ -29,6 +29,13 @@
             Teams = new List<Team>();
         }
 
+        static void Main(string[] args)
+        {
+            GameEngine game = new GameEngine();
+            game.Initialize();
+            game.Start();
+        }
+
         public void Initialize()
         {
             int currentPlayerTeamId;
@@ -70,11 +77,18 @@
 
             Teams.Add(new Team(currentPlayerTeamId));
             Teams.Add(new Team(currentPlayerTeamId == 0 ? 1 : 0));
+
+            Console.Error.WriteLine(currentPlayerTeamId);
         }
 
         public void Start()
         {
             string[] inputs;
+
+            this.fightManager.Initialize(CurrentPlayer);
+            this.fightManager.AddTeams(Teams);
+            this.fightManager.StartFight();
+
 
             // game loop
             while (true)
@@ -108,10 +122,12 @@
                 // To debug: Console.Error.WriteLine("Debug messages...");
 
 
+                this.fightManager.NextTurn();
+
                 // If roundType has a negative value then you need to output a Hero name, such as "DEADPOOL" or "VALKYRIE".
                 // Else you need to output roundType number of any valid action, such as "WAIT" or "ATTACK unitId"
                 //Console.WriteLine("WAIT");
-                Console.WriteLine(this.fightManager.RenderOutput);
+                Console.WriteLine(this.fightManager.RenderOutput());
             }
         }
     }

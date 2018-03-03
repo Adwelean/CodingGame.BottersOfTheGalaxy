@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{784BB0CD-FDB9-4D7E-866C-7AB21C15A0C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCombiner", "Client\SourceCombiner.csproj", "{784BB0CD-FDB9-4D7E-866C-7AB21C15A0C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{3F90FFD5-CCBA-454B-AF5C-5E5C0C918F38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{3F90FFD5-CCBA-454B-AF5C-5E5C0C918F38}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{F45C136C-FA4D-4393-BBCA-FDF3A76FDA38}"
+	ProjectSection(SolutionItems) = preProject
+		Build\CompiledClass.cs = Build\CompiledClass.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,12 +1,15 @@
 ﻿using System;
 
-namespace Client
+namespace SourceCombiner
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string projectFilePath = @"C:\Users\quent\source\repos\CodingGame.BottersOfTheGalaxy\Core";
+            string outputFilePath = @"C:\Users\quent\source\repos\CodingGame.BottersOfTheGalaxy\Build\CompiledClass.cs";
+
+            SourceCombiner.Build(projectFilePath, outputFilePath);
         }
     }
 }
