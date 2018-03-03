@@ -32,20 +32,8 @@
             int isVisible = int.Parse(inputs[20]); // 0 if it isn't
             int itemsOwned = int.Parse(inputs[21]); // useful from wood1
 
-            entity = new Entity(
-                x,
-                y,
-                unitId,
-                attackRange,
-                health,
-                maxHealth,
-                shield,
-                attackDamage,
-                movementSpeed,
-                stunDuration,
-                goldValue);
+            //entity = new Entity(x, y, unitId, attackRange, health, maxHealth, shield, attackDamage, movementSpeed, stunDuration, goldValue);
 
-            
             string unitType = inputs[2]; // UNIT, HERO, TOWER, can also be GROOT from wood1
 
             if(Enum.TryParse(unitType, out entityType))
@@ -53,26 +41,32 @@
                 switch (entityType)
                 {
                     case EntityType.UNIT:
-                        entity = UnBoxingHelper.ToDerived<Entity, Creep>(entity);
+                        //entity = UnBoxingHelper.ToDerived<Entity, Creep>(entity);
+                        entity = new Creep(x, y, unitId, attackRange, health, maxHealth, shield, attackDamage, movementSpeed, stunDuration, goldValue);
                         break;
 
                     case EntityType.HERO:
                         HeroType heroType;
                         string tmpHeroType = inputs[19]; // DEADPOOL, VALKYRIE, DOCTOR_STRANGE, HULK, IRONMAN
 
+                        // TODO: refactoring
                         if(Enum.TryParse(tmpHeroType, out heroType))
                         {
-                            entity = UnBoxingHelper.ToDerived<Entity, Hero>(entity);
-                            (entity as Hero).HeroType = heroType;
+                            /*entity = UnBoxingHelper.ToDerived<Entity, Hero>(entity);
+                            (entity as Hero).HeroType = heroType;*/
+
+                            entity = new Hero(x, y, unitId, attackRange, health, maxHealth, shield, attackDamage, movementSpeed, stunDuration, goldValue, countDown1, countDown2, countDown3, mana, maxMana, manaRegeneration, isVisible, itemsOwned, heroType);
                         }
                         break;
 
                     case EntityType.TOWER:
-                        entity = UnBoxingHelper.ToDerived<Entity, Tower>(entity);
+                        //entity = UnBoxingHelper.ToDerived<Entity, Tower>(entity);
+                        entity = new Tower(x, y, unitId, attackRange, health, maxHealth, shield, attackDamage, movementSpeed, stunDuration, goldValue);
                         break;
 
                     case EntityType.GROOT:
-                        entity = UnBoxingHelper.ToDerived<Entity, Groot>(entity);
+                        //entity = UnBoxingHelper.ToDerived<Entity, Groot>(entity);
+                        entity = new Groot(x, y, unitId, attackRange, health, maxHealth, shield, attackDamage, movementSpeed, stunDuration, goldValue);
                         break;
                 }
             }

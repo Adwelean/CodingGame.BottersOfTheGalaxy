@@ -23,11 +23,6 @@
         int isVisible; // 0 if it isn't
         int itemsOwned; // useful from wood1
 
-        public Hero()
-        {
-
-        }
-
         public Hero(
             double x,
             double y,
@@ -48,7 +43,7 @@
             int manaRegeneration,
             int isVisible,
             int itemsOwned,
-            HeroType heroType = HeroType.DEADPOOL
+            HeroType heroType
         ) : base(
             x,
             y,

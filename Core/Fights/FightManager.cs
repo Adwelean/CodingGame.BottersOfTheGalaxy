@@ -18,13 +18,14 @@
 
         public void Initialize (Player player) => this.fight.Initialize(player);
 
-        public void AddTeams(List<Team> teams) => teams.ForEach(x => this.fight.AddTeam(x));
+        public void AddTeam(ref Team team) => this.fight.AddTeam(ref team);
 
-        public void StartFight() => this.fight.Start();
+        public void Picking() => this.fight.PickingPhase();
+
         public void NextTurn()
         {
             output.Clear();
-            this.fight.Next();
+            this.fight.NextTurn();
         }
 
         public string RenderOutput()

@@ -21,15 +21,6 @@
         int goldValue;
         
 
-        /// <summary>
-        /// For unboxing
-        /// </summary>
-        public Entity()
-            : base(0, 0)
-        {
-
-        }
-
         public Entity(
             double x,
             double y,

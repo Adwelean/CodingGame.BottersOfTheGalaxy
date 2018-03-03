@@ -12,13 +12,17 @@
 
     public class GameEngine
     {
+        Team playerTeam;
+        Team ennemyTeam;
+
         FightManager fightManager = new FightManager();
 
         public List<Bush> Bushes { get; set; }
         public List<Spawn> Spawns { get; set; }
         public List<ItemBase> Items { get; set; }
-        public List<Team> Teams { get; set; }
         public Player CurrentPlayer { get; set; }
+        public Team PlayerTeam { get => this.playerTeam; set => this.playerTeam = value; }
+        public Team EnnemyTeam { get => this.ennemyTeam; set => this.ennemyTeam = value; }
 
 
         public GameEngine()
@@ -26,7 +30,6 @@
             Bushes = new List<Bush>();
             Spawns = new List<Spawn>();
             Items = new List<ItemBase>();
-            Teams = new List<Team>();
         }
 
         static void Main(string[] args)
@@ -75,10 +78,8 @@
                     Items.Add(item);
             }
 
-            Teams.Add(new Team(currentPlayerTeamId));
-            Teams.Add(new Team(currentPlayerTeamId == 0 ? 1 : 0));
-
-            Console.Error.WriteLine(currentPlayerTeamId);
+            PlayerTeam = new Team(currentPlayerTeamId);
+            EnnemyTeam = new Team(currentPlayerTeamId == 0 ? 1 : 0);
         }
 
         public void Start()
@@ -86,23 +87,18 @@
             string[] inputs;
 
             this.fightManager.Initialize(CurrentPlayer);
-            this.fightManager.AddTeams(Teams);
-            this.fightManager.StartFight();
-
+            this.fightManager.AddTeam(ref this.playerTeam);
+            this.fightManager.AddTeam(ref this.ennemyTeam);
+            this.fightManager.Picking();
 
             // game loop
             while (true)
             {
-                var currentPlayerTeam = Teams.FirstOrDefault(x => x.Id == CurrentPlayer.TeamId);
-                var ennemyTeam = Teams.FirstOrDefault(x => x.Id != CurrentPlayer.TeamId);
+                PlayerTeam.UpdateEntities();
+                EnnemyTeam.UpdateEntities();
 
-                int gold, enemyGold;
-
-                if(int.TryParse(Console.ReadLine(), out gold))
-                    currentPlayerTeam.Gold = gold;
-
-                if (int.TryParse(Console.ReadLine(), out enemyGold))
-                    ennemyTeam.Gold = enemyGold;
+                PlayerTeam.Gold = int.Parse(Console.ReadLine());
+                EnnemyTeam.Gold = int.Parse(Console.ReadLine());
                 
                 int roundType = int.Parse(Console.ReadLine()); // a positive value will show the number of heroes that await a command
                 int entityCount = int.Parse(Console.ReadLine());
@@ -115,7 +111,8 @@
                     var entity = EntityFactory.ParseEntity(inputs);
 
                     // TODO: add method ? observer ?
-                    Teams.FirstOrDefault(x => x.Id == teamId).Entities.Add(entity);
+                    var team = (PlayerTeam.Id == teamId) ? PlayerTeam : EnnemyTeam;
+                    team.Entities.Add(entity);
                 }
 
                 // Write an action using Console.WriteLine()

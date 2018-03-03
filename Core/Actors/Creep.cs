@@ -2,10 +2,6 @@
 {
     public class Creep : Entity
     {
-        public Creep()
-        {
-        }
-
         public Creep(
             double x,
             double y,

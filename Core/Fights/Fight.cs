@@ -20,47 +20,47 @@
 
         public Player CurrentPlayer { get; set; }
         public FightPhase FightPhase { get; set; }
-        public List<Team> Teams { get; set; }
-
-        public IArtificialIntelligence BasicIA = new Rush();
-        
+        public Team PlayerTeam { get; set; }
+        public Team EnnemyTeam { get; set; }
+        public IArtificialIntelligence CurrentAI { get; set; }
+       
 
         public Fight(ref StringBuilder output)
         {
             this.output = output;
-            Teams = new List<Team>();
         }
 
         public void Initialize(Player currentPlayer)
         {
             CurrentPlayer = currentPlayer;
+            CurrentAI = currentPlayer.AI;
             FightPhase = FightPhase.PLACEMENT;
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(ref Team team)
         {
-            if(FightPhase == FightPhase.PLACEMENT && !Teams.Any(x => x.Id == team.Id))
-                Teams.Add(team);
+            if (team.Id == CurrentPlayer.TeamId)
+                PlayerTeam = team;
+            else
+                EnnemyTeam = team;
         }
 
-        public void Pick()
+        public void PickingPhase()
         {
             if (FightPhase == FightPhase.PLACEMENT)
             {
-                this.output.AppendLine(HeroType.DEADPOOL.ToString());
+                this.output.AppendLine(CurrentPlayer.ChooseHero(EnnemyTeam).ToString());
                 FightPhase = FightPhase.FIGHTING;
             }
         }
 
-        public void Next()
+        public void NextTurn()
         {
-            var currentTeam = Teams.FirstOrDefault(x => x.Id == CurrentPlayer.TeamId);
-
-            currentTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
+            PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
                 if (hero.IA != null)
-                    this.output.AppendLine(hero.IA.ComputeAction(currentTeam, Teams.FirstOrDefault(x => x.Id != CurrentPlayer.TeamId)));
+                    this.output.AppendLine(hero.IA.ComputeAction(PlayerTeam, EnnemyTeam));
                 else
-                    this.output.AppendLine(BasicIA.ComputeAction(currentTeam, Teams.FirstOrDefault(x => x.Id != CurrentPlayer.TeamId)));
+                    this.output.AppendLine(CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam));
             });
         }
     }

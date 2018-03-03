@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCombiner", "Client\SourceCombiner.csproj", "{784BB0CD-FDB9-4D7E-866C-7AB21C15A0C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCombiner", "SourceCombiner\SourceCombiner.csproj", "{784BB0CD-FDB9-4D7E-866C-7AB21C15A0C1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{3F90FFD5-CCBA-454B-AF5C-5E5C0C918F38}"
 EndProject

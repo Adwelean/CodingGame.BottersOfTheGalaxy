@@ -2,11 +2,6 @@
 {
     public class Groot : Entity
     {
-        public Groot()
-        {
-
-        }
-
         public Groot(
             double x,
             double y,

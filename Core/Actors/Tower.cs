@@ -2,11 +2,6 @@
 {
     public class Tower : Entity
     {
-        public Tower()
-        {
-
-        }
-
         public Tower(
             double x,
             double y,
