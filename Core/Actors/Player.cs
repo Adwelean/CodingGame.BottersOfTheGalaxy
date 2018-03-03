@@ -19,7 +19,7 @@
 
         public HeroType ChooseHero(Team team)
         {
-            return HeroType.VALKYRIE;
+            return HeroType.DEADPOOL;
         }
 
         public int TeamId { get => teamId; set => teamId = value; }

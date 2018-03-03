@@ -2,6 +2,7 @@
 {
     using Core.Actors;
     using Core.AI;
+    using Core.AI.Commands;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -23,6 +24,7 @@
         public Team PlayerTeam { get; set; }
         public Team EnnemyTeam { get; set; }
         public IArtificialIntelligence CurrentAI { get; set; }
+        public CommandBase LastCommand { get; set; }
        
 
         public Fight()
@@ -57,9 +59,11 @@
         {
             PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
                 if (hero.AI != null)
-                    this.output.Add(hero.AI.ComputeAction(PlayerTeam, EnnemyTeam));
+                    LastCommand = hero.AI.ComputeAction(PlayerTeam, EnnemyTeam, hero, LastCommand);
                 else
-                    this.output.Add(CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam));
+                    LastCommand = CurrentAI.ComputeAction(PlayerTeam, EnnemyTeam, hero, LastCommand);
+
+                this.output.Add(LastCommand.Build());
             });
         }
 

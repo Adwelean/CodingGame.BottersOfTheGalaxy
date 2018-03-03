@@ -19,7 +19,9 @@
         int movementSpeed;
         int stunDuration; // useful in bronze
         int goldValue;
-        
+
+        string lastSate;
+
 
         public Entity(
             double x,
@@ -45,6 +47,21 @@
             this.goldValue = goldValue;
         }
 
+
+        public void Update(Entity entity)
+        {
+            this.id = entity.Id;
+            this.attackRange = entity.AttackRange;
+            this.health = entity.Health;
+            this.maxHealth = entity.MaxHealth;
+            this.shield = entity.Shield;
+            this.attackDamage = entity.AttackDamage;
+            this.movementSpeed = entity.MovementSpeed;
+            this.stunDuration = entity.StunDuration;
+            this.goldValue = entity.GoldValue;
+        }
+
+
         public int Id { get => id; set => id = value; }
         public int AttackRange { get => attackRange; set => attackRange = value; }
         public int Health { get => health; set => health = value; }
@@ -56,5 +73,7 @@
         public int GoldValue { get => goldValue; set => goldValue = value; }
 
         public bool IsAlive => Health > 0;
+
+        public string LastSate { get => lastSate; set => lastSate = value; }
     }
 }

@@ -1,9 +1,11 @@
 ﻿namespace Core.AI
 {
+    using Core.Actors;
+    using Core.AI.Commands;
     using Core.Fights;
 
     public interface IArtificialIntelligence
     {
-        string ComputeAction(Team currentTeam, Team ennemyTeam);
+        CommandBase ComputeAction(Team playerTeam, Team ennemyTeam, Hero playerHero, CommandBase lastCommand);
     }
 }

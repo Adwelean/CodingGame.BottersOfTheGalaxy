@@ -114,7 +114,11 @@
 
                         // TODO: add method ? observer ?
                         var team = (PlayerTeam.Id == teamId) ? PlayerTeam : EnnemyTeam;
-                        team.Entities.Add(entity);
+
+                        if (team.Entities.Any(x => x.Id == entity.Id))
+                            team.Entities.FirstOrDefault(x => x.Id == entity.Id).Update(entity);
+                        else
+                            team.Entities.Add(entity);
                     }
 
                     // Write an action using Console.WriteLine()
