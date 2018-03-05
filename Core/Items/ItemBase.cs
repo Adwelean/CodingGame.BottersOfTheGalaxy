@@ -1,6 +1,6 @@
 ﻿namespace Core.Items
 {
-    public class ItemBase
+    public abstract class ItemBase
     {
         string itemName; // contains keywords such as BRONZE, SILVER and BLADE, BOOTS connected by "_" to help you sort easier
         int itemCost; // BRONZE items have lowest cost, the most expensive items are LEGENDARY
@@ -25,7 +25,25 @@
             this.manaRegeneration = manaRegeneration;
         }
 
-        public string ItemName { get => this.itemName; }
-        public int ItemCost { get => this.itemCost; set => this.itemCost = value; }
+        public string ItemName { get => itemName; set => itemName = value; }
+        public int ItemCost { get => itemCost; set => itemCost = value; }
+        public int Damage { get => damage; set => damage = value; }
+        public int Health { get => health; set => health = value; }
+        public int MaxHealth { get => maxHealth; set => maxHealth = value; }
+        public int Mana { get => mana; set => mana = value; }
+        public int MaxMana { get => maxMana; set => maxMana = value; }
+        public int MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
+        public int ManaRegeneration { get => manaRegeneration; set => manaRegeneration = value; }
+
+        public override string ToString()
+        {
+            return $"ItemName: {ItemName}\n" +
+                   $"ItemCost: {ItemCost}\n" +
+                   $"Damage: {Damage}"
+                   /*$"Health: {Health}\n" +
+                   $"Mana: {Mana}\n" +
+                   $"MaxHealth: {MaxHealth}\n" +
+                   $"MaxMana: {MaxMana}\n"*/;
+        }
     }
 }

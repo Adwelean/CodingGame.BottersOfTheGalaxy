@@ -24,7 +24,7 @@ namespace Core.Factories
             if (isPotion == 0)
                 itemBase = new Item(itemName, itemCost, damage, health, maxHealth, mana, maxMana, moveSpeed, manaRegeneration);
             else
-                itemBase = new Consumable(itemName, itemCost, damage, health, maxHealth, mana, maxMana, moveSpeed, manaRegeneration);
+                itemBase = new Consumable(itemName, itemCost, health, mana, moveSpeed, manaRegeneration);
 
             return itemBase;
         }

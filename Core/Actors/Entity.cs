@@ -1,5 +1,9 @@
 ﻿namespace Core.Actors
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Items;
+
     public enum EntityType
     {
         UNIT,
@@ -19,9 +23,8 @@
         int movementSpeed;
         int stunDuration; // useful in bronze
         int goldValue;
-
-        string lastSate;
-
+        int itemsOwned;
+        List<Item> equipment;
 
         public Entity(
             double x,
@@ -34,7 +37,8 @@
             int attackDamage,
             int movementSpeed,
             int stunDuration,
-            int goldValue) : base(x, y)
+            int goldValue,
+            int itemsOwned) : base(x, y)
         {
             this.id = id;
             this.attackRange = attackRange;
@@ -45,6 +49,8 @@
             this.movementSpeed = movementSpeed;
             this.stunDuration = stunDuration;
             this.goldValue = goldValue;
+            this.itemsOwned = itemsOwned;
+            this.equipment = new List<Item>();
         }
 
 
@@ -64,16 +70,16 @@
 
         public int Id { get => id; set => id = value; }
         public int AttackRange { get => attackRange; set => attackRange = value; }
-        public int Health { get => health; set => health = value; }
-        public int MaxHealth { get => maxHealth; set => maxHealth = value; }
+        public int Health { get => health + Equipment.Sum(x => x.Health); set => health = (value > MaxHealth) ? MaxHealth : value; }
+        public int MaxHealth { get => maxHealth + Equipment.Sum(x => x.MaxHealth); set => maxHealth = value; }
         public int Shield { get => shield; set => shield = value; }
-        public int AttackDamage { get => attackDamage; set => attackDamage = value; }
-        public int MovementSpeed { get => movementSpeed; set => movementSpeed = value; }
+        public int AttackDamage { get => attackDamage + Equipment.Sum(x => x.Damage); set => attackDamage = value; }
+        public int MovementSpeed { get => movementSpeed + Equipment.Sum(x => x.MoveSpeed); set => movementSpeed = value; }
         public int StunDuration { get => stunDuration; set => stunDuration = value; }
         public int GoldValue { get => goldValue; set => goldValue = value; }
+        public int ItemsOwned { get => itemsOwned; set => itemsOwned = value; }
+        public List<Item> Equipment { get => equipment; set => equipment = value; }
 
         public bool IsAlive => Health > 0;
-
-        public string LastSate { get => lastSate; set => lastSate = value; }
     }
 }

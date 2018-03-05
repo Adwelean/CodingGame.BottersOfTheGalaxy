@@ -2,8 +2,8 @@
 {
     public class Consumable : ItemBase
     {
-        public Consumable(string itemName, int itemCost, int damage, int health, int maxHealth, int mana, int maxMana, int moveSpeed, int manaRegeneration) 
-            : base(itemName, itemCost, damage, health, maxHealth, mana, maxMana, moveSpeed, manaRegeneration)
+        public Consumable(string itemName, int itemCost, int health, int mana, int moveSpeed, int manaRegeneration) 
+            : base(itemName, itemCost, 0, health, 0, mana, 0, moveSpeed, manaRegeneration)
         {
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace Core.Fights
 {
     using Core.Actors;
+    using Core.Items;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -14,7 +15,7 @@
             this.fight = new Fight();
         }
 
-        public void Initialize (Player player) => this.fight.Initialize(player);
+        public void Initialize (Player player, List<ItemBase> items) => this.fight.Initialize(player, items);
 
         public void AddTeam(ref Team team) => this.fight.AddTeam(ref team);
 

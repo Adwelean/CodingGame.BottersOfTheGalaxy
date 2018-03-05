@@ -5,7 +5,7 @@
     using Core;
     using Core.Actors;
    
-    public class Team
+    public partial class Team
     {
         int id;
         int gold;
@@ -18,16 +18,6 @@
 
             this.entities = new List<Entity>();
             this.lastEntities = new List<Entity>();
-        }
-
-        public void UpdateEntities()
-        {
-            //Entities.Clear();
-            if (Entities.Count > 0)
-            {
-                LastEntities = new List<Entity>(Entities);
-                Entities.Clear();
-            }
         }
 
         public int Id { get => this.id; set => this.id = value; }

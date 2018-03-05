@@ -6,6 +6,7 @@
     using Core.Actors;
     using Core.AI.Commands;
     using Core.Fights;
+    using Core.Items;
     using Core.Utils;
 
     public class Basic : IArtificialIntelligence
@@ -17,34 +18,41 @@
             TowerAssault
         }
 
-        Team PlayerTeam { get; set; }
-        Team EnnemyTeam { get; set; }
+        GameContext context;
+
+        Team PlayerTeam => context.PlayerTeam;
+        Team EnemyTeam => context.EnemyTeam;
+        Hero PlayerHero => context.PlayerHero;
+        CommandBase LastCommand => context.LastCommand;
+        List<ItemBase> Items => context.Items;
 
         int FactorDirection => (PlayerTeam.Id > 0) ? -1 : 1;
 
-        public CommandBase ComputeAction(Team playerTeam, Team ennemyTeam, Hero playerHero, CommandBase lastCommand)
+        public CommandBase ComputeAction(GameContext context)
         {
-            CommandBase action = new Commands.Wait();
+            this.context = context;
 
-            PlayerTeam = playerTeam;
-            EnnemyTeam = ennemyTeam;
+            CommandBase action = new Commands.Wait();
 
             var playerHeroes = PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList();
             var playerTower = PlayerTeam.Entities.FirstOrDefault(x => x is Tower) as Tower;
 
-            var ennemyHeroes = EnnemyTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList();
-            var ennemyTower = EnnemyTeam.Entities.FirstOrDefault(x => x is Tower) as Tower;
+            var enemyHeroes = EnemyTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList();
+            var enemyTower = EnemyTeam.Entities.FirstOrDefault(x => x is Tower) as Tower;
 
-            var playerState = ComputeState(playerTower, playerHero, ennemyTower, ennemyHeroes);
+            var playerState = ComputeState(playerTower, PlayerHero, enemyTower, enemyHeroes);
 
-            switch(playerState)
+            //this.context.Items.Where(x => x is Item && x.Damage > 0).ToList().ForEach(item => Console.Error.WriteLine(item.ToString()));
+            //Console.Error.WriteLine("Items Owned" + PlayerHero.ItemsOwned);
+
+            switch (playerState)
             {
                 case State.Attack:
-                    action = AttackStrategy(playerTower, ennemyTower, playerHero, lastCommand);
+                    action = AttackStrategy(playerTower, enemyTower);
                     break;
 
                 case State.TowerAssault:
-                    action = TowerAssaultStrategy(ennemyTower);
+                    action = TowerAssaultStrategy(enemyTower);
                     break;
 
                 default:
@@ -55,15 +63,15 @@
             return action;
         }
 
-        public State ComputeState(Tower playerTower, Hero playerHero, Tower ennemyTower, List<Hero> ennemyHeroes)
+        public State ComputeState(Tower playerTower, Hero playerHero, Tower enemyTower, List<Hero> enemyHeroes)
         {
-            if (PlayerTeam.Entities.Count(x => x is Creep) < EnnemyTeam.Entities.Count(x => x is Creep) &&
-               ennemyHeroes.Any(x => playerTower.Distance(x) < GameSettings.MapWidth / 3))
+            if (PlayerTeam.Entities.Count(x => x is Creep) < EnemyTeam.Entities.Count(x => x is Creep) &&
+               enemyHeroes.Any(x => playerTower.Distance(x) < GameSettings.MapWidth / 3))
             {
                 return State.Protect;
             }
-            else if (PlayerTeam.Entities.Count(x => x is Creep) > EnnemyTeam.Entities.Count(x => x is Creep) &&
-                     playerHero.Distance(ennemyTower) < GameSettings.MapWidth / 4) // TODO: change by playerHero.IsInRange(ennemyTower, ennemyTower.AttackRange) ?
+            else if (//PlayerTeam.Entities.Count(x => x is Creep) > EnemyTeam.Entities.Count(x => x is Creep) &&
+                     playerHero.Distance(enemyTower) < GameSettings.MapWidth / 4) // TODO: change by playerHero.IsInRange(enemyTower, enemyTower.AttackRange) ?
             {
                 return State.TowerAssault;
             }
@@ -76,18 +84,55 @@
             return new Commands.Move(playerTower.X, playerTower.Y);
         }
 
-        public CommandBase AttackStrategy(Tower playerTower, Tower ennemyTower, Hero playerHero, CommandBase lastCommand)
+        public CommandBase AttackStrategy(Tower playerTower, Tower enemyTower)
         {
-            var creepShield = FindPlayerShieldCreep(ennemyTower);
-            var creepEnnemyWithLowHealth = EnnemyCreepWithLowHealth;
-            var hasEnnemyCreepWithLowHealth = HasEnnemyCreepWithLowHealth;
+            var creepShield = FindPlayerShieldCreep(enemyTower);
+            var creepEnemyWithLowHealth = EnemyCreepWithLowHealth;
+            var hasEnemyCreepWithLowHealth = HasEnemyCreepWithLowHealth;
 
-            if (lastCommand != null &&
-                lastCommand.Build().Contains("ATTACK") &&
-                !(hasEnnemyCreepWithLowHealth &&
-                creepEnnemyWithLowHealth != null &&
-                creepEnnemyWithLowHealth.IsInRange(playerHero, playerHero.AttackRange) &&
-                creepEnnemyWithLowHealth.Health <= playerHero.AttackDamage))
+            // Back
+            if (PlayerTeam.Entities.Where(x => x is Creep).All(x => x.Distance(enemyTower) > PlayerHero.Distance(enemyTower)))
+                return new Commands.Move(playerTower.X, playerTower.Y);
+
+            // Heal
+            if (PlayerHero.Health < PlayerHero.MaxHealth / 2)
+            {
+                var potion = Items.Where(x => x is Consumable && x.Health > 0)
+                                  .OrderByDescending(x => x.Health)
+                                  .FirstOrDefault(x => (x.Health <= PlayerHero.MaxHealth - PlayerHero.Health) &&
+                                                       PlayerTeam.CanBuyItem(x, PlayerHero));
+            
+                if(potion != null)
+                    return new Commands.Raw($"BUY {potion.ItemName}");
+            }
+
+            /*if(PlayerHero.ItemsOwned == GameSettings.MaxItemCount)
+            {
+                PlayerHero.Equipment.ForEach(item => Console.Error.WriteLine(item.ToString()));
+            }*/
+
+            // Buy blade
+            var blade = Items.Where(x => x is Item && x.Damage > 0)
+                             .OrderByDescending(x => x.Damage)
+                             .FirstOrDefault(x => ((PlayerHero.ItemsOwned == 0) ? x.Damage >= 20 : x.ItemName.Contains("Blade")) &&
+                                                    PlayerTeam.CanBuyItem(x, PlayerHero));
+
+            if (blade != null)
+            {
+                // TODO: Check why each next turn, the equipment is reset
+                Console.Error.WriteLine("Equipment Count Before: " + PlayerHero.Equipment.Count);
+                PlayerTeam.Buy(blade, PlayerHero);
+                Console.Error.WriteLine("Equipment Count After: " + PlayerHero.Equipment.Count);
+                return new Commands.Raw($"BUY {blade.ItemName}");
+            }
+
+            // Need a cover
+            if (LastCommand != null &&
+                LastCommand.Build().Contains("ATTACK") &&
+                !(hasEnemyCreepWithLowHealth &&
+                creepEnemyWithLowHealth != null &&
+                creepEnemyWithLowHealth.IsInRange(PlayerHero, PlayerHero.AttackRange) &&
+                creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage))
             {
                 if (creepShield != null)
                     return new Commands.Move(creepShield.X, creepShield.Y);
@@ -95,37 +140,47 @@
                     return new Commands.Move(playerTower.X, playerTower.Y);
             }
 
-            // Check last condition (direction)
-            if(!HasEnnemyInRange(playerHero) && !HasEnnemyInRange(new Point(playerHero.X + playerHero.MovementSpeed, playerHero.Y), playerHero.AttackRange))
-                return new Commands.Move(creepShield.X, creepShield.Y);
+            // Safe
+            if (!HasEnemyInRange(PlayerHero) &&
+                !HasEnemyInRange(new Point(PlayerHero.X + (PlayerHero.MovementSpeed * FactorDirection), PlayerHero.Y), PlayerHero.AttackRange))
+                return new Commands.Move(creepShield.X + ((creepShield.AttackRange / 2) * FactorDirection), creepShield.Y);
 
-            if (hasEnnemyCreepWithLowHealth &&
-                creepEnnemyWithLowHealth != null &&
-                creepEnnemyWithLowHealth.IsInRange(playerHero, playerHero.AttackRange) &&
-                creepEnnemyWithLowHealth.Health <= playerHero.AttackDamage)
+            // Last Hit
+            if (hasEnemyCreepWithLowHealth &&
+                creepEnemyWithLowHealth != null &&
+                creepEnemyWithLowHealth.IsInRange(PlayerHero, PlayerHero.AttackRange) &&
+                creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage)                
             {
-                return new Commands.Raw($"ATTACK {creepEnnemyWithLowHealth.Id}");
+                return new Commands.Raw($"ATTACK {creepEnemyWithLowHealth.Id}");
             }
             // TODO: can be move to the creep and attack ? check ratio < 1
-            /*else if (hasEnnemyCreepWithLowHealth &&
-                     creepEnnemyWithLowHealth != null &&
-                     creepEnnemyWithLowHealth.Health <= playerHero.AttackDamage)
+            /*else if (hasEnemyCreepWithLowHealth &&
+                     creepEnemyWithLowHealth != null &&
+                     creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage)
             {
-                return new Commands.Raw($"MOVE_ATTACK {creepEnnemyWithLowHealth.X} {creepEnnemyWithLowHealth.Y} {creepEnnemyWithLowHealth.Id}");
+                return new Commands.Raw($"MOVE_ATTACK {creepEnemyWithLowHealth.X} {creepEnemyWithLowHealth.Y} {creepEnemyWithLowHealth.Id}");
                 //return new Commands.Move(creepShield.X, creepShield.Y);
             }*/
+            // Pick Hero
+            else if (EnemyTeam.Entities.Where(x => x is Creep).All(x => x.Distance(enemyTower) + GameSettings.AggroUnitRange < EnemyTeam.Entities.OrderBy(y => y.Distance(PlayerHero)).FirstOrDefault()?.Distance(enemyTower)))
+                return new Commands.Raw($"ATTACK_NEAREST {EntityType.HERO}");
             else
-                return new Commands.Raw($"ATTACK_NEAREST {EntityType.UNIT}"); // TODO: wait a cover if the distance between hero and these creeps is too large
+                return new Commands.Raw($"ATTACK_NEAREST {EntityType.UNIT}");
         }
 
-        public CommandBase TowerAssaultStrategy(Tower ennemyTower)
+        public CommandBase TowerAssaultStrategy(Tower enemyTower)
         {
-            var creepShield = FindPlayerShieldCreep(ennemyTower);
+            var creepShield = FindPlayerShieldCreep(enemyTower);
+            Entity previousCreep;
 
-            // TODO: warning direction !
-            var previousCreep = PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive && x.Id != creepShield.Id).OrderByDescending(x => x.X).FirstOrDefault();
+            var playerCreeps = PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive && x.Id != creepShield.Id);
 
-            if(previousCreep != null)
+            if(FactorDirection > 0)
+                previousCreep = playerCreeps.OrderByDescending(x => x.X).FirstOrDefault();
+            else
+                previousCreep = playerCreeps.OrderBy(x => x.X).FirstOrDefault();
+
+            if (previousCreep != null)
                 return new Commands.Move(previousCreep.X, previousCreep.Y);
             else
                 return new Commands.Move(creepShield.X, creepShield.Y);
@@ -147,17 +202,17 @@
         }
 
 
-        public bool HasEnnemyCreepWithLowHealth => EnnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.Health != x.MaxHealth);
-        public bool HasEnnemyInRange(Hero hero) => EnnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.IsInRange(hero, hero.AttackRange));
-        public bool HasEnnemyInRange(Point heroPosition, double heroAttackRange) => EnnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.IsInRange(heroPosition, heroAttackRange));
+        public bool HasEnemyCreepWithLowHealth => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.Health != x.MaxHealth);
+        public bool HasEnemyInRange(Hero hero) => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.IsInRange(hero, hero.AttackRange));
+        public bool HasEnemyInRange(Point heroPosition, double heroAttackRange) => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.IsInRange(heroPosition, heroAttackRange));
         public Creep PlayerCreepWithLowHealth => PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive).OrderBy(x => x.Health).FirstOrDefault() as Creep;
-        public Creep EnnemyCreepWithLowHealth => EnnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).OrderBy(x => x.Health).FirstOrDefault() as Creep;
+        public Creep EnemyCreepWithLowHealth => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).OrderBy(x => x.Health).FirstOrDefault() as Creep;
 
         public bool IsInRangeOfEnemyHeroes(Creep creep)
         {
             bool isInRange = false;
 
-            EnnemyTeam.Entities.Where(x => x is Hero && x.IsAlive).ToList().ForEach(hero =>
+            EnemyTeam.Entities.Where(x => x is Hero && x.IsAlive).ToList().ForEach(hero =>
             {
                 if (creep.IsInRange(hero, hero.AttackRange))
                     isInRange = true;

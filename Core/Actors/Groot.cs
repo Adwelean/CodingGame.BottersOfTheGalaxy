@@ -25,7 +25,8 @@
             attackDamage,
             movementSpeed,
             stunDuration,
-            goldValue)
+            goldValue,
+            0)
         {
         }
     }

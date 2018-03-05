@@ -86,7 +86,7 @@
         {
             string[] inputs;
 
-            this.fightManager.Initialize(CurrentPlayer);
+            this.fightManager.Initialize(CurrentPlayer, Items);
             this.fightManager.AddTeam(ref this.playerTeam);
             this.fightManager.AddTeam(ref this.ennemyTeam);
             this.fightManager.Picking();

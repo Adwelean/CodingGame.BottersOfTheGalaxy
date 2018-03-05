@@ -6,6 +6,6 @@
 
     public interface IArtificialIntelligence
     {
-        CommandBase ComputeAction(Team playerTeam, Team ennemyTeam, Hero playerHero, CommandBase lastCommand);
+        CommandBase ComputeAction(GameContext context);
     }
 }
