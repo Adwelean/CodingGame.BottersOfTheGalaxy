@@ -143,7 +143,15 @@
                         return new Commands.Raw($"BUY {blade.ItemName}");
                     }
                     else
-                        damageItemsOrdered.FirstOrDefault(x => PlayerTeam.CanBuyItem(x, PlayerHero));
+                    {
+                        var item = damageItemsOrdered.FirstOrDefault(x => PlayerTeam.CanBuyItem(x, PlayerHero));
+
+                        if(item != null)
+                        {
+                            PlayerTeam.Buy(item, PlayerHero);
+                            return new Commands.Raw($"BUY {item.ItemName}");
+                        }
+                    }
                 }
                 else
                 {
