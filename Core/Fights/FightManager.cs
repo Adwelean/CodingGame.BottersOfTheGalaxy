@@ -17,7 +17,7 @@
 
         public void Initialize (Player player, List<ItemBase> items) => this.fight.Initialize(player, items);
 
-        public void AddTeam(ref Team team) => this.fight.AddTeam(ref team);
+        public void AddTeam(Team team) => this.fight.AddTeam(team);
 
         public void Picking() => this.fight.PickingPhase();
 

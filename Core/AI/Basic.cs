@@ -28,6 +28,8 @@
 
         int FactorDirection => (PlayerTeam.Id > 0) ? -1 : 1;
 
+        Queue<Item> pendingItemsToSell = new Queue<Item>();
+
         public CommandBase ComputeAction(GameContext context)
         {
             this.context = context;
@@ -41,9 +43,6 @@
             var enemyTower = EnemyTeam.Entities.FirstOrDefault(x => x is Tower) as Tower;
 
             var playerState = ComputeState(playerTower, PlayerHero, enemyTower, enemyHeroes);
-
-            //this.context.Items.Where(x => x is Item && x.Damage > 0).ToList().ForEach(item => Console.Error.WriteLine(item.ToString()));
-            //Console.Error.WriteLine("Items Owned" + PlayerHero.ItemsOwned);
 
             switch (playerState)
             {
@@ -81,6 +80,25 @@
 
         public CommandBase ProtectStrategy(Tower playerTower)
         {
+            var creepEnemyWithLowHealth = EnemyCreepWithLowHealth;
+
+            if (PlayerHero.Health < PlayerHero.MaxHealth / 2)
+            {
+                var potion = GetPotion();
+
+                if (potion != null)
+                    return PlayerTeam.Buy(potion, PlayerHero);
+            }
+
+            // Last Hit
+            if (HasEnemyCreepWithLowHealth &&
+                creepEnemyWithLowHealth != null &&
+                creepEnemyWithLowHealth.IsInRange(PlayerHero, PlayerHero.AttackRange) &&
+                creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage)
+            {
+                return new Commands.Raw($"ATTACK {creepEnemyWithLowHealth.Id}");
+            }
+
             return new Commands.Move(playerTower.X, playerTower.Y);
         }
 
@@ -101,29 +119,43 @@
                                   .OrderByDescending(x => x.Health)
                                   .FirstOrDefault(x => (x.Health <= PlayerHero.MaxHealth - PlayerHero.Health) &&
                                                        PlayerTeam.CanBuyItem(x, PlayerHero));
-            
-                if(potion != null)
+
+                if (potion != null)
                     return new Commands.Raw($"BUY {potion.ItemName}");
+                /*else // back
+                    return new Commands.Move(PlayerHero.X + (PlayerHero.MovementSpeed * FactorDirection), PlayerHero.Y);*/
             }
-
-            /*if(PlayerHero.ItemsOwned == GameSettings.MaxItemCount)
+            else
             {
-                PlayerHero.Equipment.ForEach(item => Console.Error.WriteLine(item.ToString()));
-            }*/
+                /*if (pendingItemsToSell.Count > 0)
+                    return new Commands.Raw($"SELL {pendingItemsToSell.Dequeue().ItemName}");*/
 
-            // Buy blade
-            var blade = Items.Where(x => x is Item && x.Damage > 0)
-                             .OrderByDescending(x => x.Damage)
-                             .FirstOrDefault(x => ((PlayerHero.ItemsOwned == 0) ? x.Damage >= 20 : x.ItemName.Contains("Blade")) &&
-                                                    PlayerTeam.CanBuyItem(x, PlayerHero));
+                // Buy blade but reserve 1 slot for potion
+                if (PlayerHero.ItemsOwned < GameSettings.MaxItemCount - 1)
+                {
+                    var damageItemsOrdered = Items.Where(x => x is Item && x.Damage > 0).OrderByDescending(x => x.Damage);
 
-            if (blade != null)
-            {
-                // TODO: Check why each next turn, the equipment is reset
-                Console.Error.WriteLine("Equipment Count Before: " + PlayerHero.Equipment.Count);
-                PlayerTeam.Buy(blade, PlayerHero);
-                Console.Error.WriteLine("Equipment Count After: " + PlayerHero.Equipment.Count);
-                return new Commands.Raw($"BUY {blade.ItemName}");
+                    var blade = damageItemsOrdered.FirstOrDefault(x => x.ItemName.Contains("Blade") && PlayerTeam.CanBuyItem(x, PlayerHero));
+
+                    if (blade != null)
+                    {
+                        PlayerTeam.Buy(blade, PlayerHero);
+                        return new Commands.Raw($"BUY {blade.ItemName}");
+                    }
+                    else
+                        damageItemsOrdered.FirstOrDefault(x => PlayerTeam.CanBuyItem(x, PlayerHero));
+                }
+                else
+                {
+                    /*var groupedItems = PlayerHero.Equipment.GroupBy(x => x.ItemName);
+                    var duplicateItems = groupedItems.SelectMany(x => x.Where(y => y.ItemName == x.Max(z => z.ItemName)));
+
+                    if (duplicateItems != null && duplicateItems.Count() > 1)
+                    {
+                        duplicateItems.ToList().ForEach(item => pendingItemsToSell.Enqueue(item));
+                        return new Commands.Raw($"SELL {pendingItemsToSell.Dequeue().ItemName}");
+                    }*/
+                }
             }
 
             // Need a cover
@@ -149,7 +181,7 @@
             if (hasEnemyCreepWithLowHealth &&
                 creepEnemyWithLowHealth != null &&
                 creepEnemyWithLowHealth.IsInRange(PlayerHero, PlayerHero.AttackRange) &&
-                creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage)                
+                creepEnemyWithLowHealth.Health <= PlayerHero.AttackDamage)
             {
                 return new Commands.Raw($"ATTACK {creepEnemyWithLowHealth.Id}");
             }
@@ -162,7 +194,7 @@
                 //return new Commands.Move(creepShield.X, creepShield.Y);
             }*/
             // Pick Hero
-            else if (EnemyTeam.Entities.Where(x => x is Creep).All(x => x.Distance(enemyTower) + GameSettings.AggroUnitRange < EnemyTeam.Entities.OrderBy(y => y.Distance(PlayerHero)).FirstOrDefault()?.Distance(enemyTower)))
+            else if (EnemyTeam.Entities.Where(x => x is Creep).All(x => (x.Distance(enemyTower) + x.MovementSpeed + x.AttackRange) < EnemyTeam.Entities.OrderBy(y => y.Distance(PlayerHero)).FirstOrDefault()?.Distance(enemyTower)))
                 return new Commands.Raw($"ATTACK_NEAREST {EntityType.HERO}");
             else
                 return new Commands.Raw($"ATTACK_NEAREST {EntityType.UNIT}");
@@ -175,7 +207,7 @@
 
             var playerCreeps = PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive && x.Id != creepShield.Id);
 
-            if(FactorDirection > 0)
+            if (FactorDirection > 0)
                 previousCreep = playerCreeps.OrderByDescending(x => x.X).FirstOrDefault();
             else
                 previousCreep = playerCreeps.OrderBy(x => x.X).FirstOrDefault();
@@ -207,6 +239,20 @@
         public bool HasEnemyInRange(Point heroPosition, double heroAttackRange) => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).Any(x => x.IsInRange(heroPosition, heroAttackRange));
         public Creep PlayerCreepWithLowHealth => PlayerTeam.Entities.Where(x => x is Creep && x.IsAlive).OrderBy(x => x.Health).FirstOrDefault() as Creep;
         public Creep EnemyCreepWithLowHealth => EnemyTeam.Entities.Where(x => x is Creep && x.IsAlive).OrderBy(x => x.Health).FirstOrDefault() as Creep;
+
+        public Consumable GetPotion() {
+            Consumable consumable = null;
+
+            var potion = Items.Where(x => x is Consumable && x.Health > 0)
+                                .OrderByDescending(x => x.Health)
+                                .FirstOrDefault(x => (x.Health <= PlayerHero.MaxHealth - PlayerHero.Health) &&
+                                                    PlayerTeam.CanBuyItem(x, PlayerHero));
+
+            if (potion != null)
+                consumable = potion as Consumable;
+
+            return consumable;
+        }
 
         public bool IsInRangeOfEnemyHeroes(Creep creep)
         {

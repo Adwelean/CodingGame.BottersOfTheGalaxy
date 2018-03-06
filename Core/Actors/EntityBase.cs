@@ -8,5 +8,11 @@
             : base(x, y)
         {
         }
+
+        /*public virtual void Update(Entity entity)
+        {
+            base.X = entity.X;
+            base.Y = entity.Y;
+        }*/
     }
 }

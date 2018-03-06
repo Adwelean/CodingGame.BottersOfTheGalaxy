@@ -14,7 +14,7 @@
         List<ItemBase> items;
         CommandBase lastCommand;
 
-        public GameContext(ref Team playerTeam, ref Team enemyTeam, ref Hero playerHero, List<ItemBase> items, CommandBase lastCommand)
+        public GameContext(Team playerTeam, Team enemyTeam, Hero playerHero, List<ItemBase> items, CommandBase lastCommand)
         {
             this.playerTeam = playerTeam;
             this.enemyTeam = enemyTeam;

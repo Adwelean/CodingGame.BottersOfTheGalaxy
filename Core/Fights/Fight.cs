@@ -43,7 +43,7 @@
             FightPhase = FightPhase.PLACEMENT;
         }
 
-        public void AddTeam(ref Team team)
+        public void AddTeam(Team team)
         {
             if (team.Id == CurrentPlayer.TeamId)
                 PlayerTeam = team;
@@ -64,9 +64,9 @@
         {
             PlayerTeam.Entities.Where(x => x is Hero).Cast<Hero>().ToList().ForEach(hero => {
                 if (hero.AI != null)
-                    LastCommand = hero.AI.ComputeAction(new GameContext(ref this.playerTeam, ref this.enemyTeam, ref hero, Items, LastCommand));
+                    LastCommand = hero.AI.ComputeAction(new GameContext(this.playerTeam, this.enemyTeam, hero, Items, LastCommand));
                 else
-                    LastCommand = CurrentAI.ComputeAction(new GameContext(ref this.playerTeam, ref this.enemyTeam, ref hero, Items, LastCommand));
+                    LastCommand = CurrentAI.ComputeAction(new GameContext(this.playerTeam, this.enemyTeam, hero, Items, LastCommand));
 
                 this.output.Add(LastCommand.Build());
             });

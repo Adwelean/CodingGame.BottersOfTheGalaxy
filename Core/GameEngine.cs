@@ -87,17 +87,17 @@
             string[] inputs;
 
             this.fightManager.Initialize(CurrentPlayer, Items);
-            this.fightManager.AddTeam(ref this.playerTeam);
-            this.fightManager.AddTeam(ref this.ennemyTeam);
+            this.fightManager.AddTeam(this.playerTeam);
+            this.fightManager.AddTeam(this.ennemyTeam);
             this.fightManager.Picking();
+            //Console.WriteLine(this.fightManager.RenderOutput());
 
             // game loop
             while (true)
             {
                 try
                 {
-                    PlayerTeam.UpdateEntities();
-                    EnnemyTeam.UpdateEntities();
+                    
 
                     PlayerTeam.Gold = int.Parse(Console.ReadLine());
                     EnnemyTeam.Gold = int.Parse(Console.ReadLine());
@@ -105,22 +105,30 @@
                     int roundType = int.Parse(Console.ReadLine()); // a positive value will show the number of heroes that await a command
                     int entityCount = int.Parse(Console.ReadLine());
 
+                    List<KeyValuePair<int, Entity>> newEntities = new List<KeyValuePair<int, Entity>>();
+
                     for (int i = 0; i < entityCount; i++)
                     {
                         inputs = Console.ReadLine().Split(' ');
                         int teamId = int.Parse(inputs[1]);
 
-                        var entity = EntityFactory.ParseEntity(inputs);
-
-                        // TODO: add method ? observer ?
-                        var team = (PlayerTeam.Id == teamId) ? PlayerTeam : EnnemyTeam;
-
-                        if (team.Entities.Any(x => x.Id == entity.Id))
-                            team.Entities.FirstOrDefault(x => x.Id == entity.Id).Update(entity);
-                        else
-                            team.Entities.Add(entity);
+                        newEntities.Add(new KeyValuePair<int, Entity>(teamId, EntityFactory.ParseEntity(inputs)));
                     }
 
+                    PlayerTeam.UpdateEntities(newEntities.Where(x => x.Key == PlayerTeam.Id).Select(x => x.Value).ToList());
+                    EnnemyTeam.UpdateEntities(newEntities.Where(x => x.Key == EnnemyTeam.Id).Select(x => x.Value).ToList());
+
+                    newEntities.ForEach(entity =>
+                    {
+                        var team = (PlayerTeam.Id == entity.Key) ? PlayerTeam : EnnemyTeam;
+
+                        if (team.Entities.Any(x => x.Id == entity.Value.Id))
+                            team.Entities.FirstOrDefault(x => x.Id == entity.Value.Id).Update(entity.Value);
+                        else
+                            team.Entities.Add(entity.Value);
+                    });
+
+                    
                     // Write an action using Console.WriteLine()
                     // To debug: Console.Error.WriteLine("Debug messages...");
 

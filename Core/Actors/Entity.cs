@@ -1,5 +1,6 @@
 ﻿namespace Core.Actors
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Core.Items;
@@ -12,7 +13,7 @@
         GROOT,
     }
 
-    public class Entity : EntityBase
+    public class Entity : EntityBase, ICloneable
     {
         int id;
         int attackRange;
@@ -56,6 +57,8 @@
 
         public void Update(Entity entity)
         {
+            base.X = entity.X;
+            base.Y = entity.Y;
             this.id = entity.Id;
             this.attackRange = entity.AttackRange;
             this.health = entity.Health;
@@ -65,8 +68,13 @@
             this.movementSpeed = entity.MovementSpeed;
             this.stunDuration = entity.StunDuration;
             this.goldValue = entity.GoldValue;
+            this.itemsOwned = entity.itemsOwned;
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
 
         public int Id { get => id; set => id = value; }
         public int AttackRange { get => attackRange; set => attackRange = value; }
